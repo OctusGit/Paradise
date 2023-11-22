@@ -4,7 +4,7 @@
 	smoothing_flags = NONE
 
 /turf/simulated/floor/vault/lavaland_air
-	temperature = 500
+	temperature = 300
 	oxygen = 14
 	nitrogen = 23
 	planetary_atmos = TRUE
