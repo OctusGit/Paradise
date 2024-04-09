@@ -4,6 +4,7 @@
 
 /obj/machinery/photocopier
 	name = "photocopier"
+	desc = "For making copies of important documents, or more likely, your ass."
 	icon = 'icons/obj/library.dmi'
 	icon_state = "bigscanner"
 
@@ -435,7 +436,7 @@
 		return
 	if(stat & (BROKEN|NOPOWER))
 		return
-	var/text = input("Enter what you want to write:", "Write", null, null) as message
+	var/text = tgui_input_text(user, "Enter what you want to write:", "Write", multiline = TRUE, encode = FALSE)
 	if(!text)
 		return
 	if(toner < 1 || !user)
@@ -579,6 +580,7 @@
 
 /obj/item/toner
 	name = "toner cartridge"
+	desc = "Has 140 papers worth of ink in it! Shame you can only use 30 before it runs out of cyan..."
 	icon = 'icons/obj/device.dmi'
 	icon_state = "tonercartridge"
 	var/toner_amount = 30

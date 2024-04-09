@@ -28,7 +28,7 @@
 	else
 		GLOB.active_jammers -= src
 	for(var/datum/action/item_action/toggle_radio_jammer/A in actions)
-		A.UpdateButtonIcon()
+		A.UpdateButtons()
 
 /obj/item/teleporter
 	name = "syndicate teleporter"
@@ -278,8 +278,8 @@
 		to_chat(user, "<span class='notice'>The injector is empty!</span>")
 		return
 	used = TRUE // Set this BEFORE the popup to prevent people using the injector more than once.
-	var/choice = alert(user, "The injector is still unused. Do you wish to use it?", "Fireproofing injector", "Yes", "No")
-	if(choice == "No")
+	var/choice = tgui_alert(user, "The injector is still unused. Do you wish to use it?", "Fireproofing injector", list("Yes", "No"))
+	if(choice != "Yes")
 		to_chat(user, "<span class='notice'>You decide against using [src].</span>")
 		used = FALSE
 		return

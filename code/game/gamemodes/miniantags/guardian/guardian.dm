@@ -30,6 +30,7 @@
 	melee_damage_upper = 15
 	AIStatus = AI_OFF
 	butcher_results = list(/obj/item/food/snacks/ectoplasm = 1)
+	hud_type = /datum/hud/guardian
 	var/summoned = FALSE
 	var/cooldown = 0
 	var/damage_transfer = 1 //how much damage from each attack we transfer to the owner
@@ -208,7 +209,7 @@
 /mob/living/simple_animal/hostile/guardian/proc/Communicate(message)
 	var/input
 	if(!message)
-		input = stripped_input(src, "Please enter a message to tell your summoner.", "Guardian", "")
+		input = tgui_input_text(src, "Please enter a message to tell your summoner.", "Guardian")
 	else
 		input = message
 	if(!input || !summoner)
@@ -282,8 +283,8 @@
 		to_chat(user, "[used_message]")
 		return
 	used = TRUE // Set this BEFORE the popup to prevent people using the injector more than once, polling ghosts multiple times, and receiving multiple guardians.
-	var/choice = alert(user, "[confirmation_message]",, "Yes", "No")
-	if(choice == "No")
+	var/choice = tgui_alert(user, "[confirmation_message]", "Confirm", list("Yes", "No"))
+	if(choice != "Yes")
 		to_chat(user, "<span class='warning'>You decide against using the [name].</span>")
 		used = FALSE
 		return
@@ -374,6 +375,7 @@
 	var/picked_name = pick(name_list)
 	create_theme(G, user, picked_name, color)
 	SSblackbox.record_feedback("tally", "guardian_pick", 1, "[pickedtype]")
+	G.client?.init_verbs()
 
 /obj/item/guardiancreator/proc/create_theme(mob/living/simple_animal/hostile/guardian/G, mob/living/user, picked_name, color)
 	G.name = "[picked_name] [color]"
