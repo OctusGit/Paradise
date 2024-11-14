@@ -101,7 +101,7 @@
 	var/follow_text
 	for(var/mob/M in GLOB.mob_list)
 		follow_text = isobserver(M) ? " ([ghost_follow_link(src, ghost=M)])" : ""
-		rendered = "<font color=\"#EE4000\"><i><span class='game say'>Blob Telepathy, <span class='name'>[name]([blob_reagent_datum.name])</span>[follow_text] <span class='message'>states, \"[message]\"</span></span></i></font>"
+		rendered = "<span class='blob'>Blob Telepathy, <span class='name'>[name]([blob_reagent_datum.name])</span>[follow_text] <span class='message'>states, \"[message]\"</span></span>"
 		if(isovermind(M) || isobserver(M) || istype(M, /mob/living/simple_animal/hostile/blob/blobbernaut))
 			M.show_message(rendered, EMOTE_AUDIBLE)
 
@@ -116,7 +116,7 @@
 		status_tab_data[++status_tab_data.len] = list("Power Stored:", "[blob_points]/[max_blob_points]")
 
 /mob/camera/blob/Move(NewLoc, Dir = 0)
-	var/obj/structure/blob/B = locate() in range("3x3", NewLoc)
+	var/obj/structure/blob/B = locate() in range(3, NewLoc)
 	if(B)
 		loc = NewLoc
 	else

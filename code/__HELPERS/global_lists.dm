@@ -139,6 +139,11 @@
 		if(initial(D.name))
 			GLOB.keybindings += new path()
 
+	for(var/path in subtypesof(/datum/preference_toggle))
+		var/datum/preference_toggle/pref_toggle = path
+		if(initial(pref_toggle.name))
+			GLOB.preference_toggles[path] = new path()
+
 	for(var/path in subtypesof(/datum/objective))
 		var/datum/objective/O = path
 		if(isnull(initial(O.name)))
@@ -151,6 +156,10 @@
 			continue
 		crit = new path()
 		GLOB.tilt_crits[path] = crit
+
+	for(var/path in subtypesof(/datum/tech))
+		var/datum/tech/T = path
+		GLOB.rnd_tech_id_to_name[initial(T.id)] = initial(T.name)
 
 /* // Uncomment to debug chemical reaction list.
 /client/verb/debug_chemical_list()

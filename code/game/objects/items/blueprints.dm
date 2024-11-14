@@ -3,7 +3,8 @@
 	icon = 'icons/obj/items.dmi'
 	icon_state = "blueprints"
 	attack_verb = list("attacked", "bapped", "hit")
-	var/fluffnotice = "Nobody's gonna read this stuff!"
+	/// Extra text added to the description.
+	var/fluffnotice = "If you can read this, make an issue report on GitHub. Something done goofed!"
 
 	var/const/AREA_ERRNONE = 0
 	var/const/AREA_STATION = 1
@@ -29,7 +30,7 @@
 	switch(get_area_type())
 		if(AREA_SPACE)
 			text += "<p>According to [src], you are now in <b>outer space</b>. Hold your breath.</p> \
-			<p><a href='?src=[UID()];create_area=1'>Mark this place as new area.</a></p>"
+			<p><a href='byond://?src=[UID()];create_area=1'>Mark this place as new area.</a></p>"
 		if(AREA_SPECIAL)
 			text += "<p>This place is not noted on [src].</p>"
 	return text
@@ -88,10 +89,10 @@
 //Station blueprints!!!
 /obj/item/areaeditor/blueprints
 	name = "station blueprints"
-	desc = "Blueprints of the station. There is a \"Classified\" stamp and several coffee stains on it."
+	desc = "Blueprints of the station. There is a \"<b>CONFIDENTIAL</b>\" stamp and several coffee stains on it."
 	icon = 'icons/obj/items.dmi'
 	icon_state = "blueprints"
-	fluffnotice = "Property of Nanotrasen. For heads of staff only. Store in high-secure storage."
+	fluffnotice = "Property of Nanotrasen. For heads of staff only. Store in high-security storage."
 	resistance_flags = INDESTRUCTIBLE | LAVA_PROOF | FIRE_PROOF | ACID_PROOF
 	w_class = WEIGHT_CLASS_NORMAL
 	var/list/showing = list()
@@ -107,12 +108,12 @@
 	var/area/our_area = get_area(src)
 	if(get_area_type() == AREA_STATION)
 		. += "<p>According to [src], you are now in <b>\"[sanitize(our_area.name)]\"</b>.</p>"
-		. += "<p>You may <a href='?src=[UID()];edit_area=1'> move an amendment</a> to the drawing.</p>"
+		. += "<p>You may <a href='byond://?src=[UID()];edit_area=1'> move an amendment</a> to the drawing.</p>"
 	if(!viewing)
-		. += "<p><a href='?src=[UID()];view_blueprints=1'>View structural data</a></p>"
+		. += "<p><a href='byond://?src=[UID()];view_blueprints=1'>View structural data</a></p>"
 	else
-		. += "<p><a href='?src=[UID()];refresh=1'>Refresh structural data</a></p>"
-		. += "<p><a href='?src=[UID()];hide_blueprints=1'>Hide structural data</a></p>"
+		. += "<p><a href='byond://?src=[UID()];refresh=1'>Refresh structural data</a></p>"
+		. += "<p><a href='byond://?src=[UID()];hide_blueprints=1'>Hide structural data</a></p>"
 	var/datum/browser/popup = new(user, "blueprints", "[src]", 700, 500)
 	popup.set_content(.)
 	popup.open()
@@ -175,7 +176,6 @@
 		/area/shuttle,
 		/area/admin,
 		/area/centcom,
-		/area/asteroid,
 		/area/tdome,
 		/area/wizard_station
 	)
@@ -211,7 +211,7 @@
 	A.always_unpowered = FALSE
 	A.set_dynamic_lighting()
 
-	for(var/i in 1 to turfs.len)
+	for(var/i in 1 to length(turfs))
 		var/turf/thing = turfs[i]
 		var/area/old_area = thing.loc
 		A.contents += thing
@@ -291,10 +291,10 @@
 
 
 /obj/item/areaeditor/proc/detect_room(turf/first)
-	var/list/turf/found = new
+	var/list/turf/found = list()
 	var/list/turf/pending = list(first)
-	while(pending.len)
-		if(found.len+pending.len > 300)
+	while(length(pending))
+		if(found.len+length(pending) > 300)
 			return ROOM_ERR_TOOLARGE
 		var/turf/T = pending[1] //why byond havent list::pop()?
 		pending -= T

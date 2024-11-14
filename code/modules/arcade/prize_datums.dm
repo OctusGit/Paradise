@@ -111,6 +111,12 @@ GLOBAL_DATUM_INIT(global_prizes, /datum/prizes, new())
 	typepath = /obj/item/ammo_box/caps
 	cost = 30
 
+/datum/prize_item/firecracker
+	name = "Firecracker Grenade"
+	desc = "A loud and obnoxious firecracker. Hold away from ears and small children."
+	typepath = /obj/item/grenade/firecracker
+	cost = 50
+
 /datum/prize_item/wallet
 	name = "Cheap Wallet"
 	desc = "A cheap and big enough for standard issue ID cards."
@@ -274,12 +280,6 @@ GLOBAL_DATUM_INIT(global_prizes, /datum/prizes, new())
 	desc = "A cool-looking turtleneck."
 	typepath = /obj/item/clothing/under/syndicate/tacticool
 	cost = 90
-
-/datum/prize_item/nanomob_booster
-	name = "Nano-Mob Hunter Trading Card Booster Pack"
-	desc = "Contains 6 random Nano-Mob Hunter Trading Cards. May contain a holographic card!"
-	typepath = /obj/item/storage/box/nanomob_booster_pack
-	cost = 100
 
 /datum/prize_item/fakespell
 	name = "Fake Spellbook"

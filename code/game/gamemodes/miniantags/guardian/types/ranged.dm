@@ -38,7 +38,7 @@
 			environment_smash = initial(environment_smash)
 			alpha = 255
 			range = 13
-			incorporeal_move = 0
+			incorporeal_move = NO_INCORPOREAL_MOVE
 			ADD_TRAIT(src, TRAIT_CAN_STRIP, TRAIT_GENERIC)
 			to_chat(src, "<span class='danger'>You switch to combat mode.</span>")
 			toggle = FALSE
@@ -50,7 +50,7 @@
 			environment_smash = ENVIRONMENT_SMASH_NONE
 			alpha = 60
 			range = 255
-			incorporeal_move = 1
+			incorporeal_move = INCORPOREAL_MOVE_NORMAL
 			REMOVE_TRAIT(src, TRAIT_CAN_STRIP, TRAIT_GENERIC) //spiritual pickpocketting is forbidden
 			to_chat(src, "<span class='danger'>You switch to scout mode.</span>")
 			toggle = TRUE
@@ -76,6 +76,11 @@
 	update_sight()
 
 	to_chat(src, "<span class='notice'>[msg]</span>")
+
+/mob/living/simple_animal/hostile/guardian/ranged/blob_act(obj/structure/blob/B)
+	if(toggle)
+		return // we don't want blob tiles to hurt us when we fly over them and trigger /Crossed(), this prevents ranged scouts from being insta killed
+	return ..() // otherwise do normal damage!
 
 /obj/item/effect/snare
 	name = "snare"

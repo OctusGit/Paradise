@@ -10,6 +10,7 @@ import './styles/themes/abductor.scss';
 import './styles/themes/cardtable.scss';
 import './styles/themes/changeling.scss';
 import './styles/themes/hackerman.scss';
+import './styles/themes/hydroponics.scss';
 import './styles/themes/malfunction.scss';
 import './styles/themes/ntos.scss';
 import './styles/themes/paper.scss';
@@ -19,10 +20,12 @@ import './styles/themes/securestorage.scss';
 import './styles/themes/security.scss';
 import './styles/themes/syndicate.scss';
 import './styles/themes/nologo.scss';
+import './styles/themes/noticeboard.scss';
 
 import { perf } from 'common/perf';
 import { setupHotReloading } from 'tgui-dev-server/link/client.cjs';
 import { setupHotKeys } from './hotkeys';
+import { loadIconRefMap } from './icons';
 import { captureExternalLinks } from './links';
 import { createRenderer } from './renderer';
 import { configureStore, StoreProvider } from './store';
@@ -34,6 +37,8 @@ perf.mark('init');
 const store = configureStore();
 
 const renderApp = createRenderer(() => {
+  loadIconRefMap();
+
   const { getRoutedComponent } = require('./routes');
   const Component = getRoutedComponent(store);
   return (
@@ -63,12 +68,9 @@ const setupApp = () => {
   // Enable hot module reloading
   if (module.hot) {
     setupHotReloading();
-    module.hot.accept(
-      ['./components', './debug', './layouts', './routes'],
-      () => {
-        renderApp();
-      }
-    );
+    module.hot.accept(['./components', './debug', './layouts', './routes'], () => {
+      renderApp();
+    });
   }
 };
 

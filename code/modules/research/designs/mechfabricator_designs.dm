@@ -249,6 +249,70 @@
 	construction_time = 13 SECONDS
 	category = list("Odysseus")
 
+//Nkarrdem
+/datum/design/nkarrdem_chassis
+	name = "Exosuit Chassis (\"Nkarrdem\")"
+	id = "nkarrdem_chassis"
+	build_type = MECHFAB
+	build_path = /obj/item/mecha_parts/chassis/nkarrdem
+	materials = list(MAT_METAL=20000)
+	construction_time = 10 SECONDS
+	category = list("Nkarrdem")
+
+/datum/design/nkarrdem_torso
+	name = "Exosuit Torso (\"Nkarrdem\")"
+	id = "nkarrdem_torso"
+	build_type = MECHFAB
+	build_path = /obj/item/mecha_parts/part/nkarrdem_torso
+	materials = list(MAT_METAL=12000)
+	construction_time = 18 SECONDS
+	category = list("Nkarrdem")
+
+/datum/design/nkarrdem_head
+	name = "Exosuit Head (\"Nkarrdem\")"
+	id = "nkarrdem_head"
+	build_type = MECHFAB
+	build_path = /obj/item/mecha_parts/part/nkarrdem_head
+	materials = list(MAT_METAL=6000,MAT_GLASS=10000)
+	construction_time = 10 SECONDS
+	category = list("Nkarrdem")
+
+/datum/design/nkarrdem_left_arm
+	name = "Exosuit Left Arm (\"Nkarrdem\")"
+	id = "nkarrdem_left_arm"
+	build_type = MECHFAB
+	build_path = /obj/item/mecha_parts/part/nkarrdem_left_arm
+	materials = list(MAT_METAL=6000)
+	construction_time = 12 SECONDS
+	category = list("Nkarrdem")
+
+/datum/design/nkarrdem_right_arm
+	name = "Exosuit Right Arm (\"Nkarrdem\")"
+	id = "nkarrdem_right_arm"
+	build_type = MECHFAB
+	build_path = /obj/item/mecha_parts/part/nkarrdem_right_arm
+	materials = list(MAT_METAL=6000)
+	construction_time = 12 SECONDS
+	category = list("Nkarrdem")
+
+/datum/design/nkarrdem_left_leg
+	name = "Exosuit Left Leg (\"Nkarrdem\")"
+	id = "nkarrdem_left_leg"
+	build_type = MECHFAB
+	build_path = /obj/item/mecha_parts/part/nkarrdem_left_leg
+	materials = list(MAT_METAL=12000)
+	construction_time = 13 SECONDS
+	category = list("Nkarrdem")
+
+/datum/design/nkarrdem_right_leg
+	name = "Exosuit Right Leg (\"Nkarrdem\")"
+	id = "nkarrdem_right_leg"
+	build_type = MECHFAB
+	build_path = /obj/item/mecha_parts/part/nkarrdem_right_leg
+	materials = list(MAT_METAL=12000)
+	construction_time = 13 SECONDS
+	category = list("Nkarrdem")
+
 //Gygax
 /datum/design/gygax_chassis
 	name = "Exosuit Chassis (\"Gygax\")"
@@ -615,6 +679,15 @@
 	construction_time = 10 SECONDS
 	category = list("Exosuit Equipment")
 
+/datum/design/mech_crusher
+	name = "Exosuit Mining Equipment (Mounted crusher)"
+	id = "mech_crusher"
+	build_type = MECHFAB
+	build_path = /obj/item/mecha_parts/mecha_equipment/mech_crusher
+	materials = list(MAT_METAL= 23000, MAT_TITANIUM = 8000)
+	construction_time = 25 SECONDS
+	category = list("Exosuit Equipment")
+
 /datum/design/mech_extinguisher
 	name = "Exosuit Engineering Equipment (Extinguisher)"
 	id = "mech_extinguisher"
@@ -661,6 +734,56 @@
 	req_tech = list("materials" = 4, "engineering" = 6, "magnets" = 6)	//now same as jaws of life
 	materials = list(MAT_METAL=5000,MAT_SILVER=2000,MAT_TITANIUM=1500)
 	construction_time = 20 SECONDS
+	category = list("Exosuit Equipment")
+
+/datum/design/mech_mop
+	name = "Exosuit Janitorial Equipment (Mega Mop)"
+	id = "mech_mop"
+	build_type = MECHFAB
+	req_tech = list("materials" = 4, "engineering" = 3)
+	build_path = /obj/item/mecha_parts/mecha_equipment/janitor/mega_mop
+	materials = list(MAT_METAL=5000,MAT_GLASS=3000)
+	construction_time = 10 SECONDS
+	category = list("Exosuit Equipment")
+
+/datum/design/mech_garbage_bag
+	name = "Exosuit Janitorial Equipment (Garbage Magnet)"
+	id = "mech_garbage_bag"
+	build_type = MECHFAB
+	req_tech = list("materials" = 5, "bluespace" = 4, "engineering" = 4, "plasmatech" = 3)
+	build_path = /obj/item/mecha_parts/mecha_equipment/janitor/garbage_magnet
+	materials = list(MAT_METAL=1500,MAT_GOLD=1500,MAT_URANIUM=700,MAT_PLASMA=2000)
+	construction_time = 10 SECONDS
+	category = list("Exosuit Equipment")
+
+/datum/design/mech_mega_spray
+	name = "Exosuit Janitorial Equipment (Mega Spray)"
+	id = "mech_mega_spray"
+	build_type = MECHFAB
+	req_tech = list("biotech" = 5, "engineering" = 6, "plasmatech" = 6)
+	build_path = /obj/item/mecha_parts/mecha_equipment/janitor/mega_spray
+	materials = list(MAT_METAL=1000,MAT_GLASS=4000,MAT_GOLD=1000,MAT_PLASMA=3000)
+	construction_time = 10 SECONDS
+	category = list("Exosuit Equipment")
+
+/datum/design/mech_light_replacer
+	name = "Exosuit Janitorial Equipment (Light Replacer)"
+	id = "mech_light_replacer"
+	build_type = MECHFAB
+	req_tech = list("bluespace" = 7, "materials" = 5, "engineering" = 6, "plasmatech" = 6)
+	build_path = /obj/item/mecha_parts/mecha_equipment/janitor/light_replacer
+	materials = list(MAT_METAL=1500,MAT_SILVER=150,MAT_GLASS=6000,MAT_BLUESPACE=300)
+	construction_time = 10 SECONDS
+	category = list("Exosuit Equipment")
+
+/datum/design/mech_cleaning_grenade_launcher
+	name = "Exosuit Janitorial Equipment (Cleaning Grenade Launcher)"
+	id = "mech_cleaning_grenade_launcher"
+	build_type = MECHFAB
+	req_tech = list("toxins" = 7, "engineering" = 7, "plasmatech" = 6, "combat" = 6)
+	build_path = /obj/item/mecha_parts/mecha_equipment/weapon/ballistic/missile_rack/cleaner
+	materials = list(MAT_METAL=5000,MAT_GLASS=3000,MAT_SILVER=4000,MAT_GOLD=6000)
+	construction_time = 10 SECONDS
 	category = list("Exosuit Equipment")
 
 /datum/design/mech_generator
@@ -793,24 +916,35 @@
 	category = list("Exosuit Equipment")
 
 /datum/design/mech_ccw_armor
-	name = "Exosuit Module (Reactive Armor Booster Module)"
+	name = "Exosuit Module (Melee Armor Booster Module)"
 	desc = "Exosuit-mounted armor booster."
 	id = "mech_ccw_armor"
 	build_type = MECHFAB
-	req_tech = list("materials" = 5, "combat" = 4)
+	req_tech = list("materials" = 5, "combat" = 5, "engineering"=3)
 	build_path = /obj/item/mecha_parts/mecha_equipment/anticcw_armor_booster
 	materials = list(MAT_METAL=20000,MAT_SILVER=5000)
 	construction_time = 10 SECONDS
 	category = list("Exosuit Equipment")
 
 /datum/design/mech_proj_armor
-	name = "Exosuit Module (Reflective Armor Booster Module)"
+	name = "Exosuit Module (Ranged Armor Booster Module)"
 	desc = "Exosuit-mounted armor booster."
 	id = "mech_proj_armor"
 	build_type = MECHFAB
 	req_tech = list("materials" = 5, "combat" = 5, "engineering"=3)
 	build_path = /obj/item/mecha_parts/mecha_equipment/antiproj_armor_booster
 	materials = list(MAT_METAL=20000,MAT_GOLD=5000)
+	construction_time = 10 SECONDS
+	category = list("Exosuit Equipment")
+
+/datum/design/mech_armor_plate
+	name = "Exosuit Mining Armor Plate"
+	desc = "This piece of metal can be attached to the mech itself, enhancing its protective characteristics. Unfortunately, only working class exosuits have notches for such armor."
+	id = "mech_plate_armor"
+	build_type = MECHFAB
+	req_tech = list("materials" = 5, "combat" = 5, "engineering" = 3)
+	build_path = /obj/item/stack/sheet/animalhide/armor_plate
+	materials = list(MAT_METAL = 20000, MAT_TITANIUM = 5000)
 	construction_time = 10 SECONDS
 	category = list("Exosuit Equipment")
 
@@ -893,8 +1027,8 @@
 	category = list("Exosuit Equipment")
 
 /datum/design/mech_carbine
-	name = "Exosuit Weapon (FNX-99 \"Hades\" Carbine)"
-	desc = "Allows for the construction of FNX-99 \"Hades\" Carbine."
+	name = "Exosuit Weapon (FNX-66 \"Hades\" Carbine)"
+	desc = "Allows for the construction of FNX-66 \"Hades\" Carbine."
 	id = "mech_carbine"
 	build_type = MECHFAB
 	req_tech = list("combat" = 5, "materials" = 4)
@@ -1080,6 +1214,16 @@
 	construction_time = 12 SECONDS
 	category = list("Cyborg Upgrade Modules")
 
+/datum/design/borg_upgrade_abductor_jani
+	name = "Cyborg Upgrade (Abductor Janitorial Equipment)"
+	id = "borg_upgade_abductor_jani"
+	build_type = MECHFAB
+	build_path = /obj/item/borg/upgrade/abductor_jani
+	req_tech = list("biotech" = 7, "materials" = 7, "abductor" = 3)
+	materials = list(MAT_METAL = 10000, MAT_SILVER = 7500, MAT_PLASMA = 2500, MAT_TITANIUM = 7500, MAT_DIAMOND = 5000) //Base abductor jani tools *5
+	construction_time = 12 SECONDS
+	category = list("Cyborg Upgrade Modules")
+
 /datum/design/borg_upgrade_lavaproof
 	name = "Cyborg Upgrade (Lavaproof Chassis)"
 	id = "borg_upgrade_lavaproof"
@@ -1125,7 +1269,7 @@
 	build_type = MECHFAB
 	build_path = /obj/item/borg/upgrade/floorbuffer
 	req_tech = list("materials" = 4, "engineering" = 4)
-	materials = list(MAT_METAL=15000, MAT_GLASS=15000)
+	materials = list(MAT_METAL = 9000, MAT_GLASS = 7600)
 	construction_time = 12 SECONDS
 	category = list("Cyborg Upgrade Modules")
 
@@ -1234,14 +1378,14 @@
 	category = list("Misc")
 
 /datum/design/synthetic_flash
-	name = "Synthetic Flash"
-	desc = "A synthetic flash used mostly in borg construction."
-	id = "sflash"
+	name = "Flash"
+	desc = "A flash used mostly in borg construction."
+	id = "sflash" // Keeping this ID as is because we might have something tracking it
 	req_tech = list("magnets" = 3, "combat" = 2)
 	build_type = MECHFAB
 	materials = list(MAT_METAL = 750, MAT_GLASS = 750)
 	construction_time = 10 SECONDS
-	build_path = /obj/item/flash/synthetic
+	build_path = /obj/item/flash
 	category = list("Misc")
 
 /datum/design/voice_standard

@@ -30,11 +30,6 @@
 		ui.set_autoupdate(FALSE)
 		ui.open()
 
-/obj/machinery/prize_counter/ui_assets(mob/user)
-	return list(
-		get_asset_datum(/datum/asset/spritesheet/prize_counter)
-	)
-
 /obj/machinery/prize_counter/ui_data(mob/user)
 	var/list/data = list()
 	data["tickets"] = tickets
@@ -45,12 +40,14 @@
 
 	var/list/prizes = list()
 	for(var/datum/prize_item/prize in GLOB.global_prizes.prizes)
+		var/obj/prize_item = prize.typepath
 		prizes += list(list(
 			"name" = initial(prize.name),
 			"desc" = initial(prize.desc),
 			"cost" = prize.cost,
+			"icon" = prize_item.icon,
+			"icon_state" = prize_item.icon_state,
 			"itemID" = GLOB.global_prizes.prizes.Find(prize),
-			"imageID" = replacetext(replacetext("[prize.typepath]", "/obj/item/", ""), "/", "-"),
 		))
 	static_data["prizes"] = prizes
 
@@ -93,24 +90,33 @@
 			to_chat(user, "<span class='warning'>\The [T] seems stuck to your hand!</span>")
 		return
 	if(panel_open)
-		if(istype(O, /obj/item/wrench))
-			default_unfasten_wrench(user, O, time = 6 SECONDS)
-		if(component_parts && istype(O, /obj/item/crowbar))
-			if(tickets)		//save the tickets!
-				print_tickets()
-			default_deconstruction_crowbar(user, O)
 		return
 
 	return ..()
 
+/obj/machinery/prize_counter/crowbar_act(mob/living/user, obj/item/I)
+	if(!panel_open || !component_parts)
+		return
+	. = TRUE
+	if(tickets)		//save the tickets!
+		print_tickets()
+	default_deconstruction_crowbar(user, I)
+
 /obj/machinery/prize_counter/screwdriver_act(mob/living/user, obj/item/I)
 	if(!anchored)
 		return
-	I.play_tool_sound(src)
+	. = TRUE
+	if(!I.use_tool(src, user, I.tool_volume))
+		return
 	panel_open = !panel_open
 	to_chat(user, "<span class='notice'>You [panel_open ? "open" : "close"] the maintenance panel.</span>")
 	update_icon(UPDATE_ICON_STATE)
-	return TRUE
+
+/obj/machinery/prize_counter/wrench_act(mob/living/user, obj/item/I)
+	if(!panel_open)
+		return
+	. = TRUE
+	default_unfasten_wrench(user, I, time = 6 SECONDS)
 
 /obj/machinery/prize_counter/attack_hand(mob/user)
 	if(..())

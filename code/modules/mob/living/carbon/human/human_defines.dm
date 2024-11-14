@@ -32,6 +32,8 @@
 	var/height = "average height"
 	/// Players physique (even MORE fluff)
 	var/physique = "average"
+	/// The body type associated with the body
+	var/body_type = MALE
 
 	var/underwear = "Nude"	//Which underwear the player wants
 	var/undershirt = "Nude"	//Which undershirt the player wants
@@ -101,3 +103,6 @@
 	var/list/bodyparts = list()
 	/// map organ names to organs
 	var/list/bodyparts_by_name = list()
+
+	/// Lazylist of sources to track what our alpha should be, alpha is set to the minimum. Use the `set_alpha_tracking` and `get_alpha` helpers.
+	var/list/alpha_sources

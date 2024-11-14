@@ -70,12 +70,6 @@
 /obj/machinery/atmospherics/pipe/manifold/pipeline_expansion()
 	return list(node1, node2, node3)
 
-/obj/machinery/atmospherics/pipe/manifold/process_atmos()
-	if(!parent)
-		..()
-	else
-		. = PROCESS_KILL
-
 /obj/machinery/atmospherics/pipe/manifold/Destroy()
 	. = ..()
 
@@ -122,8 +116,8 @@
 /obj/machinery/atmospherics/pipe/manifold/update_overlays()
 	. = ..()
 	alpha = 255
-	. += SSair.icon_manager.get_atmos_icon("manifold", null, pipe_color, "core" + icon_connect_type)
-	. += SSair.icon_manager.get_atmos_icon("manifold", null, null, "clamps" + icon_connect_type)
+	. += GLOB.pipe_icon_manager.get_atmos_icon("manifold", null, pipe_color, "core" + icon_connect_type)
+	. += GLOB.pipe_icon_manager.get_atmos_icon("manifold", null, null, "clamps" + icon_connect_type)
 	update_underlays()
 
 /obj/machinery/atmospherics/pipe/manifold/update_underlays()

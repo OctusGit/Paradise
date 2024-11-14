@@ -166,9 +166,14 @@ GLOBAL_DATUM_INIT(multispin_words, /regex, regex("like a record baby"))
 				var/mob/living/carbon/human/H = L
 				if(H.check_ear_prot() >= HEARING_PROTECTION_TOTAL)
 					continue
-			listeners += L
+			if(istype(L, /mob/camera/aiEye))
+				var/mob/camera/aiEye/ai_eye = L
+				if(ai_eye.relay_speech && ai_eye.ai)
+					listeners += ai_eye.ai
+			else
+				listeners += L
 
-	if(!listeners.len)
+	if(!length(listeners))
 		next_command = world.time + cooldown_none
 		return
 
@@ -209,9 +214,9 @@ GLOBAL_DATUM_INIT(multispin_words, /regex, regex("like a record baby"))
 			//Cut out the job so it doesn't trigger commands
 			found_string = L.mind.assigned_role
 
-	if(specific_listeners.len)
+	if(length(specific_listeners))
 		listeners = specific_listeners
-		power_multiplier *= (1 + (1/specific_listeners.len)) //2x on a single guy, 1.5x on two and so on
+		power_multiplier *= (1 + (1/length(specific_listeners))) //2x on a single guy, 1.5x on two and so on
 		message = copytext(message, 0, 1)+copytext(message, 1 + length(found_string), length(message) + 1)
 
 	//STUN
@@ -428,7 +433,7 @@ GLOBAL_DATUM_INIT(multispin_words, /regex, regex("like a record baby"))
 		for(var/V in listeners)
 			var/mob/living/L = V
 			if(L.buckled && istype(L.buckled, /obj/structure/chair))
-				L.buckled.unbuckle_mob(L)
+				L.unbuckle()
 		next_command = world.time + cooldown_meme
 
 	//DANCE
@@ -493,7 +498,11 @@ GLOBAL_DATUM_INIT(multispin_words, /regex, regex("like a record baby"))
 
 /obj/item/organ/internal/vocal_cords/colossus/wizard
 	desc = "They carry the voice of an ancient god. This one is enchanted to implant it into yourself when used in hand."
+	var/has_implanted = FALSE
 
 /obj/item/organ/internal/vocal_cords/colossus/wizard/attack_self(mob/living/user)
+	if(has_implanted)
+		return
 	user.drop_item()
 	insert(user)
+	has_implanted = TRUE

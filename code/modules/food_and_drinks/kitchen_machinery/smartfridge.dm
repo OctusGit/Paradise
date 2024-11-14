@@ -82,7 +82,7 @@
 	update_icon(UPDATE_OVERLAYS)
 	// Accepted items
 	accepted_items_typecache = typecacheof(list(
-		/obj/item/food/snacks/grown,
+		/obj/item/food/grown,
 		/obj/item/seeds,
 		/obj/item/grown,
 	))
@@ -178,31 +178,43 @@
 	return ..()
 
 /obj/machinery/smartfridge/attackby(obj/item/O, mob/user)
-	if(exchange_parts(user, O))
+	if(istype(O, /obj/item/storage/part_replacer))
+		. = ..()
 		SStgui.update_uis(src)
 		return
+
 	if(stat & (BROKEN|NOPOWER))
-		to_chat(user, "<span class='notice'>\The [src] is unpowered and useless.</span>")
+		to_chat(user, "<span class='notice'>[src] is unpowered and useless.</span>")
 		return
 
 	if(load(O, user))
-		user.visible_message("<span class='notice'>[user] has added \the [O] to \the [src].</span>", "<span class='notice'>You add \the [O] to \the [src].</span>")
+		user.visible_message(
+			"<span class='notice'>[user] has added [O] to [src].</span>",
+			"<span class='notice'>You add [O] to [src].</span>"
+		)
 		SStgui.update_uis(src)
 		update_icon(UPDATE_OVERLAYS)
-	else if(istype(O, /obj/item/storage/bag) || istype(O, /obj/item/storage/box))
+		return
+
+	if(istype(O, /obj/item/storage/bag) || istype(O, /obj/item/storage/box))
 		var/obj/item/storage/P = O
 		var/items_loaded = 0
 		for(var/obj/G in P.contents)
 			if(load(G, user))
 				items_loaded++
 		if(items_loaded)
-			user.visible_message("<span class='notice'>[user] loads \the [src] with \the [P].</span>", "<span class='notice'>You load \the [src] with \the [P].</span>")
+			user.visible_message(
+				"<span class='notice'>[user] loads [src] with [P].</span>",
+				"<span class='notice'>You load [src] with [P].</span>"
+			)
 			SStgui.update_uis(src)
 			update_icon(UPDATE_OVERLAYS)
 		var/failed = length(P.contents)
 		if(failed)
 			to_chat(user, "<span class='notice'>[failed] item\s [failed == 1 ? "is" : "are"] refused.</span>")
-	else if(!istype(O, /obj/item/card/emag))
+		return
+
+	if(!istype(O, /obj/item/card/emag))
 		to_chat(user, "<span class='notice'>\The [src] smartly refuses [O].</span>")
 		return TRUE
 
@@ -422,18 +434,103 @@
 	. = ..()
 	accepted_items_typecache = typecacheof(list(
 		/obj/item/kitchen,
-		/obj/item/food))
+		/obj/item/food,
+		/obj/item/seeds,
+		/obj/item/grown,
+		/obj/item/reagent_containers/condiment))
 
 // Syndicate Druglab Ruin
 /obj/machinery/smartfridge/food/syndicate_druglab
 	starting_items = list(
-		/obj/item/food/snacks/boiledrice = 2,
-		/obj/item/food/snacks/macncheese = 1,
-		/obj/item/food/snacks/syndicake = 3,
-		/obj/item/food/snacks/beans = 4,
+		/obj/item/food/boiledrice = 2,
+		/obj/item/food/macncheese = 1,
+		/obj/item/food/syndicake = 3,
+		/obj/item/food/beans = 4,
 		/obj/item/reagent_containers/glass/beaker/waterbottle/large = 7,
 		/obj/item/reagent_containers/drinks/bottle/kahlua = 1,
 		/obj/item/reagent_containers/drinks/bottle/orangejuice = 2)
+
+///The Chefs smartfridge. This smartfridge will spawn with a random condiment, then 3 stacks of 3 plants (or fish meat) to give chef some extra starting variety, or new ideas on what to cook!
+/obj/machinery/smartfridge/food/chef
+
+/obj/machinery/smartfridge/food/chef/Initialize(mapload)
+	starting_items = generate_starting_items()
+	. = ..()
+
+/obj/machinery/smartfridge/food/chef/proc/generate_starting_items()
+	// These plants are blocked for being inedable, downright toxic, RND plants, botany plants, or wheat.
+	var/list/static/forbidden_plants = list(
+		/obj/item/food/grown/wheat,
+		/obj/item/food/grown/meatwheat,
+		/obj/item/food/grown/shell/gatfruit,
+		/obj/item/food/grown/apple/poisoned,
+		/obj/item/food/grown/cherry_bomb,
+		/obj/item/food/grown/firelemon,
+		/obj/item/food/grown/ambrosia/gaia,
+		/obj/item/food/grown/mushroom/glowshroom,
+		/obj/item/food/grown/mushroom/glowshroom/glowcap,
+		/obj/item/food/grown/mushroom/glowshroom/shadowshroom,
+		/obj/item/food/grown/cannabis, // I don't care about weed pizza, sorry.
+		/obj/item/food/grown/cannabis/rainbow,
+		/obj/item/food/grown/cannabis/death,
+		/obj/item/food/grown/cannabis/white,
+		/obj/item/food/grown/cannabis/ultimate,
+		/obj/item/food/grown/tobacco,
+		/obj/item/food/grown/pumpkin/blumpkin,
+		/obj/item/food/grown/berries/poison,
+		/obj/item/food/grown/berries/death,
+		/obj/item/food/grown/berries/glow,
+		/obj/item/food/grown/comfrey,
+		/obj/item/food/grown/aloe,
+		/obj/item/food/grown/kudzupod,
+		/obj/item/food/grown/holymelon, // Lets not out vampires or cult by accident thanks
+		/obj/item/food/grown/mushroom/reishi, // I would block out Amanita but it has 2 recipies, might be funny.
+		/obj/item/food/grown/mushroom/angel,
+		/obj/item/food/grown/random,
+		/obj/item/food/grown/tea,
+		/obj/item/food/grown/tea/astra,
+		/obj/item/food/grown/coffee,
+		/obj/item/food/grown/coffee/robusta,
+		/obj/item/food/grown/grass,
+		/obj/item/food/grown/grass/carpet,
+		/obj/item/food/grown/harebell,
+		/obj/item/food/grown/poppy,
+		/obj/item/food/grown/lily,
+		/obj/item/food/grown/geranium,
+		/obj/item/food/grown/moonflower,
+		/obj/item/food/grown/ash_flora/shavings,
+		/obj/item/food/grown/ash_flora/mushroom_leaf,
+		/obj/item/food/grown/ash_flora/mushroom_cap,
+		/obj/item/food/grown/ash_flora/mushroom_stem,
+		/obj/item/food/grown/ash_flora/cactus_fruit,
+		/obj/item/food/grown/shell,
+		/obj/item/food/grown/mushroom/fungus,
+		/obj/item/food/grown/mushroom,
+		/obj/item/food/grown/ash_flora,
+	)
+	var/list/output = list()
+	for(var/I in 1 to 3)
+		var/obj/item/food/chosen
+		if(prob(95))
+			chosen = pick(subtypesof(/obj/item/food/grown) - forbidden_plants)
+		else // Fish / sushi stuff, or xenomeat rarely as a treat
+			chosen = pick(/obj/item/food/catfishmeat, /obj/item/food/carpmeat, /obj/item/food/salmonmeat, /obj/item/food/shrimp, /obj/item/food/monstermeat/xenomeat)
+		output[chosen] += 3
+	// Adds 2 condiment bottles as bonus. No hotsauce or ketchup, as the chef starts with that
+	for(var/G in 1 to 2)
+		output += pick(
+			/obj/item/reagent_containers/condiment/bbqsauce,
+			/obj/item/reagent_containers/condiment/soysauce,
+			/obj/item/reagent_containers/condiment/mayonnaise,
+			/obj/item/reagent_containers/condiment/cherryjelly,
+			/obj/item/reagent_containers/condiment/peanutbutter,
+			/obj/item/reagent_containers/condiment/honey,
+			/obj/item/reagent_containers/condiment/oliveoil,
+			/obj/item/reagent_containers/condiment/frostoil,
+			/obj/item/reagent_containers/condiment/wasabi,
+			/obj/item/reagent_containers/condiment/vinegar,
+		)
+	return output
 
 /**
   * # Seed Storage
@@ -475,7 +572,7 @@
 /obj/machinery/smartfridge/foodcart/Initialize(mapload)
 	. = ..()
 	accepted_items_typecache = typecacheof(list(
-		/obj/item/food/snacks,
+		/obj/item/food,
 		/obj/item/reagent_containers/drinks,
 		/obj/item/reagent_containers/condiment,
 	))
@@ -700,7 +797,7 @@
 /obj/machinery/smartfridge/disks/Initialize(mapload)
 	. = ..()
 	accepted_items_typecache = typecacheof(list(
-		/obj/item/disk,
+		/obj/item/disk
 	))
 
 /obj/machinery/smartfridge/disks/update_fridge_contents()
@@ -715,6 +812,7 @@
 			fill_level = 3
 		if(4 to INFINITY)
 			fill_level = 4
+
 /obj/machinery/smartfridge/id
 	name = "identification card compartmentalizer"
 	desc = "A machine capable of storing identification cards and PDAs. It's great for lost and terminated cards."
@@ -837,7 +935,7 @@
 	component_parts = null
 	// Accepted items
 	accepted_items_typecache = typecacheof(list(
-		/obj/item/food/snacks,
+		/obj/item/food,
 		/obj/item/stack/sheet/wetleather,
 	))
 
@@ -886,8 +984,8 @@
 /obj/machinery/smartfridge/drying_rack/accept_check(obj/item/O)
 	. = ..()
 	// If it's a food, reject non driable ones
-	if(istype(O, /obj/item/food/snacks))
-		var/obj/item/food/snacks/S = O
+	if(istype(O, /obj/item/food))
+		var/obj/item/food/S = O
 		if(!S.dried_type)
 			return FALSE
 
@@ -908,7 +1006,7 @@
   * Called in [/obj/machinery/smartfridge/drying_rack/process] to dry the contents.
   */
 /obj/machinery/smartfridge/drying_rack/proc/rack_dry()
-	for(var/obj/item/food/snacks/S in contents)
+	for(var/obj/item/food/S in contents)
 		if(S.dried_type == S.type)//if the dried type is the same as the object's type, don't bother creating a whole new item...
 			S.color = "#ad7257"
 			S.dry = TRUE

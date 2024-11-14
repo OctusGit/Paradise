@@ -15,7 +15,14 @@ SUBSYSTEM_DEF(mapping)
 	///What do we have as the lavaland theme today?
 	var/datum/lavaland_theme/lavaland_theme
 	///What primary cave theme we have picked for cave generation today.
-	var/cave_theme
+	var/datum/caves_theme/caves_theme
+	// Tells if all maintenance airlocks have emergency access enabled
+	var/maint_all_access = FALSE
+	// Tells if all station airlocks have emergency access enabled
+	var/station_all_access = FALSE
+
+	/// A mapping of environment names to MILLA environment IDs.
+	var/list/environments
 
 // This has to be here because world/New() uses [station_name()], which looks this datum up
 /datum/controller/subsystem/mapping/PreInit()
@@ -40,15 +47,26 @@ SUBSYSTEM_DEF(mapping)
 		F << next_map.type
 
 /datum/controller/subsystem/mapping/Initialize()
+	environments = list()
+	environments[ENVIRONMENT_LAVALAND] = create_environment(oxygen = LAVALAND_OXYGEN, nitrogen = LAVALAND_NITROGEN, temperature = LAVALAND_TEMPERATURE)
+	environments[ENVIRONMENT_TEMPERATE] = create_environment(oxygen = MOLES_O2STANDARD, nitrogen = MOLES_N2STANDARD, temperature = T20C)
+	environments[ENVIRONMENT_COLD] = create_environment(oxygen = MOLES_O2STANDARD, nitrogen = MOLES_N2STANDARD, temperature = 180)
+
 	var/datum/lavaland_theme/lavaland_theme_type = pick(subtypesof(/datum/lavaland_theme))
 	ASSERT(lavaland_theme_type)
 	lavaland_theme = new lavaland_theme_type
-	log_startup_progress("We're in the mood for [initial(lavaland_theme.name)] today...") //We load this first. In the event some nerd ever makes a surface map, and we don't have it in lavaland in the event lavaland is disabled.
+	log_startup_progress("We're in the mood for [lavaland_theme.name] today...") //We load this first. In the event some nerd ever makes a surface map, and we don't have it in lavaland in the event lavaland is disabled.
+	SSblackbox.record_feedback("text", "procgen_settings", 1, "[lavaland_theme_type]")
 
-	cave_theme = pick(BLOCKED_BURROWS, CLASSIC_CAVES, DEADLY_DEEPROCK)
-	log_startup_progress("We feel like [cave_theme] today...")
+	var/caves_theme_type = pick(subtypesof(/datum/caves_theme))
+	ASSERT(caves_theme_type)
+	caves_theme = new caves_theme_type
+	log_startup_progress("We feel like [caves_theme.name] today...")
+	SSblackbox.record_feedback("text", "procgen_settings", 1, "[caves_theme_type]")
+
 	// Load all Z level templates
 	preloadTemplates()
+	preloadTemplates(path = "code/modules/unit_tests/atmos/")
 
 	// Load the station
 	loadStation()
@@ -76,7 +94,8 @@ SUBSYSTEM_DEF(mapping)
 		seedRuins(list(level_name_to_num(MINING)), GLOB.configuration.ruins.lavaland_ruin_budget, /area/lavaland/surface/outdoors/unexplored, GLOB.lava_ruins_templates)
 		if(lavaland_theme)
 			lavaland_theme.setup()
-			lavaland_theme.setup_caves()
+		if(caves_theme)
+			caves_theme.setup()
 		var/time_spent = stop_watch(lavaland_setup_timer)
 		log_startup_progress("Successfully populated lavaland in [time_spent]s.")
 	else
@@ -99,9 +118,11 @@ SUBSYSTEM_DEF(mapping)
 		var/list/pickable_turfs = list()
 		for(var/turf/turfs in AR)
 			pickable_turfs += turfs
+			CHECK_TICK
 		var/turf/picked = safepick(pickable_turfs)
 		if(picked && is_station_level(picked.z))
 			teleportlocs[AR.name] = AR
+		CHECK_TICK
 
 	teleportlocs = sortAssoc(teleportlocs)
 
@@ -112,8 +133,10 @@ SUBSYSTEM_DEF(mapping)
 		var/list/pickable_turfs = list()
 		for(var/turf/turfs in AR)
 			pickable_turfs += turfs
+			CHECK_TICK
 		if(length(pickable_turfs))
 			ghostteleportlocs[AR.name] = AR
+		CHECK_TICK
 
 	ghostteleportlocs = sortAssoc(ghostteleportlocs)
 
@@ -123,9 +146,11 @@ SUBSYSTEM_DEF(mapping)
 		var/list/pickable_turfs = list()
 		for(var/turf/turfs in AR)
 			pickable_turfs += turfs
+			CHECK_TICK
 		var/turf/picked = safepick(pickable_turfs)
 		if(picked && is_station_level(picked.z))
 			existing_station_areas += AR
+		CHECK_TICK
 
 	// World name
 	if(GLOB.configuration.general.server_name)
@@ -137,6 +162,59 @@ SUBSYSTEM_DEF(mapping)
 		generate_themed_messes(subtypesof(/obj/effect/spawner/themed_mess) - /obj/effect/spawner/themed_mess/party)
 	if(HAS_TRAIT(SSstation, STATION_TRAIT_HANGOVER))
 		generate_themed_messes(list(/obj/effect/spawner/themed_mess/party))
+
+/datum/controller/subsystem/mapping/proc/seed_space_salvage(space_z_levels)
+	log_startup_progress("Seeding space salvage...")
+	var/space_salvage_timer = start_watch()
+	var/seeded_salvage_surfaces = list()
+	var/seeded_salvage_closets = list()
+
+	var/list/small_salvage_items = list(
+		/obj/item/salvage/ruin/brick,
+		/obj/item/salvage/ruin/nanotrasen,
+		/obj/item/salvage/ruin/carp,
+		/obj/item/salvage/ruin/tablet,
+		/obj/item/salvage/ruin/pirate,
+		/obj/item/salvage/ruin/soviet
+	)
+
+	for(var/z_level in space_z_levels)
+		var/list/turf/z_level_turfs = block(1, 1, z_level, world.maxx, world.maxy, z_level)
+		for(var/z_level_turf in z_level_turfs)
+			var/turf/T = z_level_turf
+			var/area/A = get_area(T)
+			if(istype(A, /area/ruin/space))
+							// cardboard boxes are blacklisted otherwise deepstorage.dmm ends up hogging all the loot
+				var/list/closet_blacklist = list(/obj/structure/closet/cardboard, /obj/structure/closet/fireaxecabinet, /obj/structure/closet/walllocker/emerglocker, /obj/structure/closet/crate/can, /obj/structure/closet/body_bag, /obj/structure/closet/coffin)
+				for(var/obj/structure/closet/closet in T)
+					if(is_type_in_list(closet, closet_blacklist))
+						continue
+
+					seeded_salvage_closets |= closet
+				for(var/obj/structure/table/table in T)
+					if(locate(/obj/machinery) in T)
+						continue // Machinery on tables tend to take up all the visible space
+					seeded_salvage_surfaces |= table
+
+	var/max_salvage_attempts = rand(10, 15)
+	while(max_salvage_attempts > 0 && length(seeded_salvage_closets) > 0)
+		var/obj/structure/closet/C = pick_n_take(seeded_salvage_closets)
+		var/salvage_item_type = pick(small_salvage_items)
+		var/obj/salvage_item = new salvage_item_type(C)
+		salvage_item.pixel_x = rand(-5, 5)
+		salvage_item.pixel_y = rand(-5, 5)
+		max_salvage_attempts -= 1
+
+	max_salvage_attempts = rand(10, 15)
+	while(max_salvage_attempts > 0 && length(seeded_salvage_surfaces) > 0)
+		var/obj/T = pick_n_take(seeded_salvage_surfaces)
+		var/salvage_item_type = pick(small_salvage_items)
+		var/obj/salvage_item = new salvage_item_type(T.loc)
+		salvage_item.pixel_x = rand(-5, 5)
+		salvage_item.pixel_y = rand(-5, 5)
+		max_salvage_attempts -= 1
+
+	log_startup_progress("Successfully seeded space salvage in [stop_watch(space_salvage_timer)]s.")
 
 // Do not confuse with seedRuins()
 /datum/controller/subsystem/mapping/proc/handleRuins()
@@ -155,8 +233,10 @@ SUBSYSTEM_DEF(mapping)
 	// Note that this budget is not split evenly accross all zlevels
 	log_startup_progress("Seeding ruins...")
 	var/seed_ruins_timer = start_watch()
-	seedRuins(levels_by_trait(SPAWN_RUINS), rand(20, 30), /area/space, GLOB.space_ruins_templates)
+	var/space_z_levels = levels_by_trait(SPAWN_RUINS)
+	seedRuins(space_z_levels, rand(20, 30), /area/space, GLOB.space_ruins_templates)
 	log_startup_progress("Successfully seeded ruins in [stop_watch(seed_ruins_timer)]s.")
+	seed_space_salvage(space_z_levels)
 
 // Loads in the station
 /datum/controller/subsystem/mapping/proc/loadStation()
@@ -203,7 +283,7 @@ SUBSYSTEM_DEF(mapping)
 	log_startup_progress("Loaded Lavaland in [stop_watch(watch)]s")
 
 /datum/controller/subsystem/mapping/proc/seedRuins(list/z_levels = null, budget = 0, whitelist = /area/space, list/potentialRuins)
-	if(!z_levels || !z_levels.len)
+	if(!z_levels || !length(z_levels))
 		WARNING("No Z levels provided - Not generating ruins")
 		return
 
@@ -230,10 +310,10 @@ SUBSYSTEM_DEF(mapping)
 			continue
 		ruins_availible[R] = R.placement_weight
 
-	while(budget > 0 && (ruins_availible.len || forced_ruins.len))
+	while(budget > 0 && (length(ruins_availible) || length(forced_ruins)))
 		var/datum/map_template/ruin/current_pick
 		var/forced = FALSE
-		if(forced_ruins.len) //We have something we need to load right now, so just pick it
+		if(length(forced_ruins)) //We have something we need to load right now, so just pick it
 			for(var/ruin in forced_ruins)
 				current_pick = ruin
 				if(forced_ruins[ruin] > 0) //Load into designated z
@@ -285,6 +365,42 @@ SUBSYSTEM_DEF(mapping)
 				ruins_availible -= R
 
 	log_world("Ruin loader finished with [budget] left to spend.")
+
+/datum/controller/subsystem/mapping/proc/make_maint_all_access()
+	for(var/area/station/maintenance/A in existing_station_areas)
+		for(var/obj/machinery/door/airlock/D in A)
+			D.emergency = TRUE
+			D.update_icon()
+	GLOB.minor_announcement.Announce("Access restrictions on maintenance and external airlocks have been removed.")
+	maint_all_access = TRUE
+	SSblackbox.record_feedback("nested tally", "keycard_auths", 1, list("emergency maintenance access", "enabled"))
+
+/datum/controller/subsystem/mapping/proc/revoke_maint_all_access()
+	for(var/area/station/maintenance/A in existing_station_areas)
+		for(var/obj/machinery/door/airlock/D in A)
+			D.emergency = FALSE
+			D.update_icon()
+	GLOB.minor_announcement.Announce("Access restrictions on maintenance and external airlocks have been re-added.")
+	maint_all_access = FALSE
+	SSblackbox.record_feedback("nested tally", "keycard_auths", 1, list("emergency maintenance access", "disabled"))
+
+/datum/controller/subsystem/mapping/proc/make_station_all_access()
+	for(var/obj/machinery/door/airlock/D in GLOB.airlocks)
+		if(is_station_level(D.z))
+			D.emergency = TRUE
+			D.update_icon()
+	GLOB.minor_announcement.Announce("Access restrictions on all station airlocks have been removed due to an ongoing crisis. Trespassing laws still apply unless ordered otherwise by Command staff.")
+	station_all_access = TRUE
+	SSblackbox.record_feedback("nested tally", "keycard_auths", 1, list("emergency station access", "enabled"))
+
+/datum/controller/subsystem/mapping/proc/revoke_station_all_access()
+	for(var/obj/machinery/door/airlock/D in GLOB.airlocks)
+		if(is_station_level(D.z))
+			D.emergency = FALSE
+			D.update_icon()
+	GLOB.minor_announcement.Announce("Access restrictions on all station airlocks have been re-added. Seek station AI or a colleague's assistance if you are stuck.")
+	station_all_access = FALSE
+	SSblackbox.record_feedback("nested tally", "keycard_auths", 1, list("emergency station access", "disabled"))
 
 /datum/controller/subsystem/mapping/Recover()
 	flags |= SS_NO_INIT

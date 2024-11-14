@@ -96,7 +96,7 @@
 			var/attempt_code = tgui_input_number(user, "Re-enter the current EFTPOS access code:", "Confirm old EFTPOS code", max_value = 9999, min_value = 1000)
 			if(attempt_code == access_code)
 				var/trycode = tgui_input_number(user, "Enter a new access code for this device:", "Enter new EFTPOS code", max_value = 9999, min_value = 1000)
-				if(!trycode)
+				if(isnull(trycode))
 					return
 				access_code = trycode
 				print_reference()
@@ -122,7 +122,7 @@
 			transaction_purpose = purpose
 		if("trans_value")
 			var/try_num = tgui_input_number(user, "Enter amount for EFTPOS transaction", "Transaction amount", transaction_amount, MAX_EFTPOS_CHARGE)
-			if(!check_user_position(user) || !try_num)
+			if(!check_user_position(user) || isnull(try_num))
 				return
 			transaction_amount = try_num
 		if("toggle_lock")
@@ -144,14 +144,14 @@
 				var/obj/item/card/id/C = I
 				if((ACCESS_CENT_COMMANDER in C.access) || (ACCESS_HOP in C.access) || (ACCESS_CAPTAIN in C.access))
 					access_code = 0
-					to_chat(user, "[bicon(src)]<span class='info'>Access code reset to 0.</span>")
+					to_chat(user, "[bicon(src)]<span class='notice'>Access code reset to 0.</span>")
 			else if(istype(I, /obj/item/card/emag))
 				access_code = 0
-				to_chat(user, "[bicon(src)]<span class='info'>Access code reset to 0.</span>")
+				to_chat(user, "[bicon(src)]<span class='notice'>Access code reset to 0.</span>")
 
 
 /obj/item/eftpos/proc/scan_card(obj/item/card/id/C, mob/user, secured = TRUE)
-	visible_message("<span class='info'>[user] swipes a card through [src].</span>")
+	visible_message("<span class='notice'>[user] swipes a card through [src].</span>")
 
 	if(!transaction_locked || transaction_paid || !secured)
 		return

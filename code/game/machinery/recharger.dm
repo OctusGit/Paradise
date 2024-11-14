@@ -12,7 +12,7 @@
 	active_power_consumption = 200
 	pass_flags = PASSTABLE
 
-	var/list/allowed_devices = list(/obj/item/gun/energy, /obj/item/melee/baton, /obj/item/rcs, /obj/item/bodyanalyzer, /obj/item/handheld_chem_dispenser, /obj/item/clothing/suit/armor/reactive)
+	var/list/allowed_devices = list(/obj/item/gun/energy, /obj/item/melee/baton, /obj/item/rcs, /obj/item/bodyanalyzer, /obj/item/handheld_chem_dispenser, /obj/item/clothing/suit/armor/reactive, /obj/item/wormhole_jaunter/wormhole_weaver)
 	var/recharge_coeff = 1
 
 	var/obj/item/charging = null // The item that is being charged
@@ -49,7 +49,7 @@
 
 	//Checks to make sure he's not in space doing it, and that the area got proper power.
 	var/area/A = get_area(src)
-	if(!istype(A) || !A.powernet.equipment_powered)
+	if(!istype(A) || !A.powernet.has_power(PW_CHANNEL_EQUIPMENT))
 		to_chat(user, "<span class='warning'>[src] blinks red as you try to insert [G].</span>")
 		return
 
@@ -91,6 +91,8 @@
 
 /obj/machinery/recharger/wrench_act(mob/user, obj/item/I)
 	. = TRUE
+	if(istype(src, /obj/machinery/recharger/wallcharger))	// Unwrenching wall rechargers and dragging them off all kinds of cursed.
+		return
 	if(panel_open)
 		to_chat(user, "<span class='warning'>Close the maintenance panel first!</span>")
 		return
@@ -200,6 +202,10 @@
 	if(istype(I, /obj/item/clothing/suit/armor/reactive))
 		var/obj/item/clothing/suit/armor/reactive/A = I
 		return A.cell
+
+	if(istype(I, /obj/item/wormhole_jaunter/wormhole_weaver))
+		var/obj/item/wormhole_jaunter/wormhole_weaver/W = I
+		return W.wcell
 
 	return null
 
